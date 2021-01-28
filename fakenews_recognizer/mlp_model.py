@@ -2,7 +2,7 @@ from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.layers import Dense
 
 
-def model(x_train, y_train, x_test, y_test, features):
+def mlp_model(x_train, y_train, x_test, y_test, features):
     # ann network
     model = Sequential()
     model.add(Dense(1000, activation='relu', input_dim=features))
