@@ -1,11 +1,15 @@
 import re
+import nltk
 import numpy as np
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from pandas import DataFrame
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from keras.preprocessing import sequence
 from keras.preprocessing.text import Tokenizer
+from sklearn.preprocessing import StandardScaler
 from tensorflow.python.keras.utils.np_utils import to_categorical
 
 
@@ -31,12 +35,9 @@ def clean(text, stop_words):
     return text
 
 
-def prepare_data():
+def prepare_for_lstm():
     # import data
     df = pd.read_csv('dataset/bbc-text.csv')
-
-    # define labels
-    labels = ['tech', 'politics', 'sport', 'entertainment', 'business']
 
     # separate text and target
     all_labels = np.array(df['category'])
@@ -73,7 +74,7 @@ def prepare_data():
     return X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer
 
 
-def prepare_input_data(text, tokenizer, max_len):
+def prepare_input_for_lstm(text, tokenizer, max_len):
     # clean texts
     stop_words = set(stopwords.words('english'))
     cleaned_text = clean(text, stop_words)
@@ -86,3 +87,65 @@ def prepare_input_data(text, tokenizer, max_len):
     encoded_text = sequence.pad_sequences(encoded_text, maxlen=max_len)
 
     return encoded_text
+
+
+def prepare_for_mlp():
+    # import data
+    df = pd.read_csv('dataset/bbc-text.csv')
+
+    ###tech = 0, politics = 1, sport = 2, entertainment = 3, business = 4
+
+    tokenizer = nltk.tokenize.TreebankWordTokenizer()
+    stemmer = nltk.WordNetLemmatizer()
+
+    # prepare text
+    tokenized_text = []
+
+    for text in df['text']:
+        train_tokenized = tokenizer.tokenize(str(text))
+        train_lemmatized = [" ".join(stemmer.lemmatize(word) for word in train_tokenized)]
+        tokenized_text.append(train_lemmatized)
+
+    # text to numbers
+    tfidf = TfidfVectorizer(stop_words='english', min_df=2, max_df=0.5, max_features=10000, ngram_range=(1, 2))
+    new_df = DataFrame(tokenized_text, columns=['text'])
+    vectorized_text = tfidf.fit_transform(new_df['text'])
+
+    scaler = StandardScaler()
+    new = vectorized_text.toarray().tolist()
+    scaled_text = scaler.fit_transform(new)
+
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(df['category'])
+    all_encoded_labels = tokenizer.texts_to_sequences(df['category'])
+    all_encoded_labels = np.array(all_encoded_labels)
+
+    x_train, x_test, y_train, y_test = train_test_split(scaled_text, all_encoded_labels, test_size=0.2)
+
+    features = len(tfidf.get_feature_names())
+
+    y_train = to_categorical(y_train)[:, 1:]
+    y_test = to_categorical(y_test)[:, 1:]
+
+    return x_train, y_train, x_test, y_test, features
+
+
+def prepare_input_for_mlp(text, tfidf, scaler):
+    # fit the input text to the data preparation
+    # prepare text
+    tokenizer = nltk.tokenize.TreebankWordTokenizer()
+    stemmer = nltk.WordNetLemmatizer()
+    tokenized_text = []
+    train_tokenized = tokenizer.tokenize(str(text))
+    train_lemmatized = [" ".join(stemmer.lemmatize(word) for word in train_tokenized)]
+    tokenized_text.append(train_lemmatized)
+
+    # text to numbers
+    new_df = DataFrame(tokenized_text, columns=['text'])
+    vectorized_text = tfidf.transform(new_df['text'])
+
+    # scale data
+    new = vectorized_text.toarray().tolist()
+    scaled_text = scaler.fit_transform(new)
+    return scaled_text
+

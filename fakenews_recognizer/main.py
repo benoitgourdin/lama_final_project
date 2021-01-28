@@ -1,3 +1,5 @@
+import numpy as np
+
 from fakenews_recognizer.fake_news_data_preparation import prepare_for_mlp, prepare_for_lstm, prepare_input_for_mlp
 from fakenews_recognizer.lstm_model import lstm_model
 from fakenews_recognizer.mlp_model import mlp_model
@@ -17,6 +19,7 @@ if __name__ == '__main__':
     x = prepare_input_for_mlp(text, tfidf, scaler)
     #x = prepare_input_for_lstm(text, tokenizer, max_len)
     result = model.predict(x)
+    result = np.argmax(result, axis=1)
     if result == 1:
         print("fake news!")
     elif result == 0:
