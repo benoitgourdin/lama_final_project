@@ -127,7 +127,7 @@ def prepare_for_mlp():
     y_train = to_categorical(y_train)[:, 1:]
     y_test = to_categorical(y_test)[:, 1:]
 
-    return x_train, y_train, x_test, y_test, features
+    return x_train, y_train, x_test, y_test, features, tfidf, scaler
 
 
 def prepare_input_for_mlp(text, tfidf, scaler):

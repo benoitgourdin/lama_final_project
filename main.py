@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from pandas import DataFrame
+
 import fakenews_recognizer as fn
 from sklearn.model_selection import train_test_split
 
@@ -59,11 +61,11 @@ if __name__ == '__main__':
     df = df.sample(frac=1).reset_index(drop=True)
 
     # create dataframes for topics
-    df0 = np.DataFrame()
-    df1 = np.DataFrame()
-    df2 = np.DataFrame()
-    df3 = np.DataFrame()
-    df4 = np.DataFrame()
+    df0 = DataFrame(columns=['text', 'target'])
+    df1 = DataFrame(columns=['text', 'target'])
+    df2 = DataFrame(columns=['text', 'target'])
+    df3 = DataFrame(columns=['text', 'target'])
+    df4 = DataFrame(columns=['text', 'target'])
 
     # predict topic of dataset
     for i in range(len(df)):
