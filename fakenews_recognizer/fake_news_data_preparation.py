@@ -46,7 +46,7 @@ def data():
     return df
 
 
-def prepare_for_mlp():
+def prepare_for_fnn():
     # import and short data
     # FAKE = 1, TRUE = 0
     df_1 = Fake_Real_News().sample(frac=1).reset_index(drop=True)
@@ -91,7 +91,7 @@ def prepare_for_mlp():
     return x_train, y_train, x_test, y_test, features, tfidf, scaler
 
 
-def prepare_input_for_mlp(text, tfidf, scaler):
+def prepare_input_for_fnn(text, tfidf, scaler):
     # fit the input text to the data preparation
     # prepare text
     tokenizer = nltk.tokenize.TreebankWordTokenizer()
