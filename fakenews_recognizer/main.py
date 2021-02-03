@@ -3,6 +3,7 @@ import numpy as np
 from fakenews_recognizer.fake_news_data_preparation import prepare_for_fnn, prepare_for_lstm, prepare_input_for_fnn
 from fakenews_recognizer.lstm_model import lstm_model
 from fakenews_recognizer.fnn_model import fnn_model
+from fakenews_recognizer.cnn_model import cnn_model
 from fakenews_recognizer.passive_aggressive_model import train_passive_aggressive_classifier
 
 if __name__ == '__main__':
@@ -13,6 +14,7 @@ if __name__ == '__main__':
 
     #X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
     #model = lstm_model(X_train, y_train, X_test, y_test, amount_words, max_len)
+    #model = cnn_model(X_train, y_train, X_test, y_test, amount_words, max_len)
 
     # predict
     while(True):
