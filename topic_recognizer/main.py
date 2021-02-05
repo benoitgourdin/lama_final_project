@@ -11,7 +11,6 @@ if __name__ == '__main__':
     labels = ['tech', 'politics', 'sport', 'entertainment', 'business']
 
     # train model
-
     #X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
     #model = lstm_model(X_train, y_train, X_test, y_test, amount_words, max_len)
 

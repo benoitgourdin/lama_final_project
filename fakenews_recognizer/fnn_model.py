@@ -3,7 +3,7 @@ from tensorflow.python.keras.layers import Dense
 
 
 def fnn_model(x_train, y_train, x_test, y_test, features):
-    # ann network
+    # fnn network
     model = Sequential()
     model.add(Dense(1000, activation='relu', input_dim=features))
     model.add(Dense(500))

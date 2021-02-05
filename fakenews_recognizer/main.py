@@ -12,9 +12,9 @@ if __name__ == '__main__':
     model = fnn_model(x_train, y_train, x_test, y_test, features)
     #model = train_passive_aggressive_classifier(x_train, x_test, y_train, y_test)
 
-    #X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
-    #model = lstm_model(X_train, y_train, X_test, y_test, amount_words, max_len)
-    #model = cnn_model(X_train, y_train, X_test, y_test, amount_words, max_len)
+    #x_train, y_train, x_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
+    #model = lstm_model(x_train, y_train, x_test, y_test, amount_words, max_len)
+    #model = cnn_model(x_train, y_train, x_test, y_test, amount_words, max_len)
 
     # predict
     while(True):

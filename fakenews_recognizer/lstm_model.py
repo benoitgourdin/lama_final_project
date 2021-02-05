@@ -5,7 +5,7 @@ import numpy as np
 
 
 def lstm_model(x_train, y_train, x_test, y_test, amount_words, max_len):
-    # ann network
+    # lstm network
     model = Sequential()
     model.add(Embedding(input_dim=amount_words, output_dim=128, input_length=max_len))
     model.add(LSTM(100))
