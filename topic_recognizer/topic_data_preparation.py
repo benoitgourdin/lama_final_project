@@ -89,7 +89,7 @@ def prepare_input_for_lstm(text, tokenizer, max_len):
     return encoded_text
 
 
-def prepare_for_fnn():
+def prepare_for_mlp():
     # import data
     df = pd.read_csv('dataset/bbc-text.csv')
 
@@ -130,7 +130,7 @@ def prepare_for_fnn():
     return x_train, y_train, x_test, y_test, features, tfidf, scaler
 
 
-def prepare_input_for_fnn(text, tfidf, scaler):
+def prepare_input_for_mlp(text, tfidf, scaler):
     # fit the input text to the data preparation
     # prepare text
     tokenizer = nltk.tokenize.TreebankWordTokenizer()

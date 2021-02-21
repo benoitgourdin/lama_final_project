@@ -46,7 +46,7 @@ def data():
     return df
 
 
-def prepare_for_fnn():
+def prepare_for_mlp():
     # import and short data
     # FAKE = 1, TRUE = 0
     df_1 = Fake_Real_News().sample(frac=1).reset_index(drop=True)
@@ -65,7 +65,22 @@ def prepare_for_fnn():
     stemmer = nltk.WordNetLemmatizer()
     tokenized_text = []
     for text in df['text']:
+        # separate words in a list
         train_tokenized = tokenizer.tokenize(str(text))
+        # remove useless words, letters or brackets which are recurrent in the texts
+        if 'n' in train_tokenized:
+            train_tokenized.remove('n')
+        if 's' in train_tokenized:
+            train_tokenized.remove('s')
+        if 't' in train_tokenized:
+            train_tokenized.remove('t')
+        if 'Reuters' in train_tokenized:
+            train_tokenized.remove('Reuters')
+        if '(' in train_tokenized:
+            train_tokenized.remove('(')
+        if ')' in train_tokenized:
+            train_tokenized.remove(')')
+        # grouping inflected forms
         train_lemmatized = [" ".join(stemmer.lemmatize(word) for word in train_tokenized)]
         tokenized_text.append(train_lemmatized)
 
@@ -91,9 +106,9 @@ def prepare_for_fnn():
     return x_train, y_train, x_test, y_test, features, tfidf, scaler
 
 
-def prepare_input_for_fnn(text, tfidf, scaler):
+def prepare_input_for_mlp(text, tfidf, scaler):
     # fit the input text to the data preparation
-    # prepare text
+    # tokenize, lemmatize input text
     tokenizer = nltk.tokenize.TreebankWordTokenizer()
     stemmer = nltk.WordNetLemmatizer()
     tokenized_text = []
@@ -101,13 +116,13 @@ def prepare_input_for_fnn(text, tfidf, scaler):
     train_lemmatized = [" ".join(stemmer.lemmatize(word) for word in train_tokenized)]
     tokenized_text.append(train_lemmatized)
 
-    # text to numbers
-    new_df = DataFrame(tokenized_text, columns=['text'])
+    # vectorize the article
+    new_df = pd.DataFrame(tokenized_text, columns=['text'])
     vectorized_text = tfidf.transform(new_df['text'])
 
-    # scale data
+    # scale with StandardScaler
     new = vectorized_text.toarray().tolist()
-    scaled_text = scaler.fit_transform(new)
+    scaled_text = scaler.transform(new)
     return scaled_text
 
 
@@ -157,6 +172,74 @@ def prepare_for_lstm():
 
     return X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer
 
+
+def prepare_for_lstm_after_topics(topics_model, topics):
+    # import and short data
+    # FAKE = 1, TRUE = 0
+    df_1 = Fake_Real_News().sample(frac=1).reset_index(drop=True)
+    df_2 = fake_or_real_news().sample(frac=1).reset_index(drop=True)
+    df_3 = data().sample(frac=1).reset_index(drop=True)
+    df_1 = df_1[:4000]
+    df_2 = df_2[:4000]
+    df_3 = df_3[:4000]
+    df = df_1
+    df = df.append(df_2, ignore_index=True)
+    df = df.append(df_3, ignore_index=True)
+    df = df.sample(frac=1).reset_index(drop=True)
+
+    # separate text and target
+    all_labels = np.array(df['target'])
+    all_texts = np.array(df['text'])
+
+    # clean texts
+    stop_words = set(stopwords.words('english'))
+    all_cleaned_texts = np.array([clean(str(text), stop_words) for text in all_texts])
+
+    # tokenize
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(all_cleaned_texts)
+    all_encoded_texts = tokenizer.texts_to_sequences(all_cleaned_texts)
+    all_encoded_texts = np.array(all_encoded_texts)
+    amount_words = len(tokenizer.word_index) + 1
+
+    # get the length of the longest text
+    length = []
+    for text in all_encoded_texts:
+        length.append(len(text))
+    max_len = max(length)
+
+    # every text has the same length
+    all_encoded_texts = sequence.pad_sequences(all_encoded_texts, maxlen=max_len)
+
+    # categorize data
+    all_labels = to_categorical(all_labels)
+
+    # predict topic
+    topic_labels = []
+    for text in all_encoded_texts:
+        topic_label = topics_model.predict(text)
+        topic_labels.append(topic_label)
+
+    # split data
+    X_train = []
+    X_test = []
+    Y_train = []
+    Y_test = []
+    len_of_categories = []
+    for k in range(len(topics)):
+        text_list = []
+        label_list = []
+        for i in range(len(all_encoded_texts)):
+            if topic_labels[i] == k:
+                text_list.append(all_encoded_texts[i])
+                label_list.append(all_labels[i])
+        x_train, x_test, y_train, y_test = train_test_split(text_list, label_list, test_size=0.2, random_state=11)
+        X_train.append(x_train)
+        X_test.append(x_test)
+        Y_train.append(y_train)
+        Y_test.append(y_test)
+        len_of_categories.append(len(x_train))
+    return X_train, Y_train, X_test, Y_test, amount_words, max_len, tokenizer, len_of_categories
 
 
 def prepare_input_for_lstm(text, tokenizer, max_len):
