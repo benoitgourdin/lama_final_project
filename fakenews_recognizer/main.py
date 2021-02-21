@@ -25,34 +25,11 @@ if __name__ == '__main__':
         elif result == 0:
             print("true news!")
 
-def predict_news(texts):
 
-    # train model
-    X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
-    model = lstm_model(X_train, y_train, X_test, y_test, amount_words, max_len)
-
-    #x_train, y_train, x_test, y_test, features, tfidf, scaler = prepare_for_mlp()
-    #model = mlp_model(x_train, y_train, x_test, y_test, features)
-
-    results = []
-
-    for text in texts:
-
-        text = prepare_input_for_lstm(text, tokenizer, max_len)
-        #text = prepare_input_for_mlp(text, tfidf, scaler)
-
-        # predict
-        result = model.predict(text)
-        result = np.argmax(result, axis=1)
-        results.append(result)
-
-    return results
-
-
-def fake_news_algo_with_topics(topics_model, topics, texts, predictions):
+def fake_news_after_topics(topics_model, topics, texts, predictions):
     models = []
     results = []
-    
+
     # train model
     X_train, Y_train, X_test, Y_test, amount_words, max_len, tokenizer, len_of_categories = prepare_for_lstm_after_topics(topics_model, topics)
     index = 0

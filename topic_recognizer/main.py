@@ -29,33 +29,9 @@ if __name__ == '__main__':
         print(labels[result])
 
 
-def predict_topics(texts):
-
-    # train model
-    X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
-    model = lstm_model(X_train, y_train, X_test, y_test, amount_words, max_len)
-
-    #x_train, y_train, x_test, y_test, features, tfidf, scaler = prepare_for_mlp()
-    #model = mlp_model(x_train, y_train, x_test, y_test, features)
-
-    results = []
-
-    for text in texts:
-
-        text = prepare_input_for_lstm(text, tokenizer, max_len)
-        #text = prepare_input_for_mlp(text, tfidf, scaler)
-
-        # predict
-        result = model.predict(text)
-        result = np.argmax(result, axis=1)
-        results.append(result)
-
-    return results
-
-def train_topic_algo():
+def train_topic():
 
     # train model
     X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer = prepare_for_lstm()
     model = lstm_model(X_train, y_train, X_test, y_test, amount_words, max_len)
     return model
-

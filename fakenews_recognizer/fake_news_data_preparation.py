@@ -173,6 +173,21 @@ def prepare_for_lstm():
     return X_train, y_train, X_test, y_test, amount_words, max_len, tokenizer
 
 
+def prepare_input_for_lstm(text, tokenizer, max_len):
+    # clean texts
+    stop_words = set(stopwords.words('english'))
+    cleaned_text = clean(text, stop_words)
+
+    # tokenize
+    encoded_text = tokenizer.texts_to_sequences(cleaned_text)
+    encoded_text = np.array(encoded_text)
+
+    # fit length to lstm
+    encoded_text = sequence.pad_sequences(encoded_text, maxlen=max_len)
+
+    return encoded_text
+
+
 def prepare_for_lstm_after_topics(topics_model, topics):
     # import and short data
     # FAKE = 1, TRUE = 0
@@ -242,19 +257,7 @@ def prepare_for_lstm_after_topics(topics_model, topics):
     return X_train, Y_train, X_test, Y_test, amount_words, max_len, tokenizer, len_of_categories
 
 
-def prepare_input_for_lstm(text, tokenizer, max_len):
-    # clean texts
-    stop_words = set(stopwords.words('english'))
-    cleaned_text = clean(text, stop_words)
 
-    # tokenize
-    encoded_text = tokenizer.texts_to_sequences(cleaned_text)
-    encoded_text = np.array(encoded_text)
-
-    # fit length to lstm
-    encoded_text = sequence.pad_sequences(encoded_text, maxlen=max_len)
-
-    return encoded_text
 
 
 def clean(text, stop_words):
